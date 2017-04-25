@@ -4,7 +4,7 @@
 (defonce server (atom nil))
 
 (defn match-route [uri]
-    (get routes uri))
+  (get routes uri))
 
 (defn handler [req]
   (let [uri (:uri req)
