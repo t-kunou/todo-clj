@@ -1,28 +1,13 @@
 (ns todo-clj.core
-  (:require [ring.adapter.jetty :as server]))
+  (:require [compojure.core :refer [defroutes context GET]]
+    [compojure.route :as route]
+    [ring.adapter.jetty :as server]
+    [ring.util.response :as res]))
 
 (defonce server (atom nil))
 
-(defn match-route [uri]
-  (get routes uri))
-
-(defn handler [req]
-  (let [uri (:uri req)
-    maybe-fn (match-route uri)]
-      (if maybe-fn
-        (maybe-fn req)
-          (not-found))))
-
-(defn ok [body]
-  {:status 200
-    :body body})
-
 (defn html [res]
-  (assoc res :headers {"Content-Type" "text/html; charset=utf-8"}))
-
-(defn not-found []
-  {:status 404
-    :body "<h1>404 page not found</1>"})
+    (res/content-type res "text/html; charset=utf-8"))
 
 (defn home-view [req]
   "<h1>ホーム画面</h1>
@@ -30,13 +15,14 @@
 
 (defn home [req]
   (-> (home-view req)
-    ok
-      html))
+    res/response
+    html))
 
 (def todo-list
   [{:title "朝ごはんを作る"}
    {:title "燃えるゴミを出す"}
    {:title "卵を買って帰る"}
+   {:title "プリンも買って帰る"}
    {:title "お風呂を洗う"}])
 
 (defn todo-index-view [req]
@@ -48,13 +34,20 @@
 
 (defn todo-index [req]
   (-> (todo-index-view req)
-    ok
+    res/response
     html))
 
 (def routes
   {"/" home
     "/todo" todo-index})
 
+(defn match-route [uri]
+  (get routes uri))
+
+(defroutes handler
+  (GET "/" req home)
+  (GET "/todo" req todo-index)
+  (route/not-found "<h1>404 page not found</h1>"))
 
 (defn start-server []
   (when-not @server
