@@ -8,7 +8,8 @@
    <a href=\"/todo\">TODO 一覧</a>")
 
 (defn home [req]
-  (-> (home-view req)
+  (throw (Exception. "Test Exception"))
+  #_(-> (home-view req)
       res/response
       res/html))
 
