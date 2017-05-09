@@ -13,7 +13,7 @@
 
 (defn start-server []
   (when-not @server
-    (reset! server (server/run-jetty #'handler {:port 3333 :join? false}))))
+    (reset! server (server/run-jetty #'app {:port 3333 :join? false}))))
 
 (defn stop-server []
   (when @server
